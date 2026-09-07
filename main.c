@@ -11,7 +11,6 @@ int main()
 
     printf("Quantas equações serão digitadas? ");
     if (scanf("%d", &equacoes) == 1 && equacoes > 0){
-        // Limpa o '\n' restante do buffer do scanf antes de usar fgets
         int c;
         while ((c = getchar()) != '\n' && c != EOF); 
 

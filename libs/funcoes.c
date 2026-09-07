@@ -32,35 +32,6 @@ int *identifica_numeros(const char *equacao, int *qtd)
     return numeros;
 }
 
-/*
-int *identifica_numeros(const char *equacao, int *qtd)
-{
-    int *numeros = malloc(50 * sizeof(int));
-    int num_count = 0;
-
-    for (int i = 0; equacao[i] != '\0';)
-    {
-        if (isdigit(equacao[i]))
-        {
-            int valor_atual = 0;
-            while (isdigit(equacao[i]))
-            {
-                valor_atual = valor_atual * 10 + (equacao[i] - '0');
-                i++;
-            }
-            numeros[num_count++] = valor_atual;
-        }
-        else
-        {
-            i++;
-        }
-    }
-
-    *qtd = num_count;
-    return numeros;
-} 
-*/
-
 void scan_equacao(int n)
 {
     char equacao[50];
@@ -88,24 +59,3 @@ void scan_equacao(int n)
         }
     }
 }
-
-/*
-void scan_equacao(int n, int *qtd)
-{
-    char equacao[50];
-    for (int i = 0; i < n; i++)
-    {
-        printf("Digite a equação %d:", i + 1);
-        scanf("%49s", equacao);
-        int *numeros = identifica_numeros(equacao, qtd);
-
-        printf("Números encontrados: ");
-        for (int j = 0; j < *qtd; j++){
-            printf("%d ", numeros[j]);
-        }
-        printf("\n");
-
-        free(numeros);
-    }
-}
-    */

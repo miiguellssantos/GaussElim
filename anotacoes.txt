@@ -1,5 +1,12 @@
-Este arquivo tem o propósito de 'explicar' trechos do código para melhor
-entendimento da sua complexidade.
+Este arquivo tem o propósito de 'explicar' trechos do código para melhor entendimento da sua complexidade.
+
+roteiro de execução:
+1. main.c pergunta quantas equações serão digitadas e chama scan_equacao
+passando esse número n como parâmetro;
+2. scan_equacao itera n vezes um loop onde pergunta a equacao a ser digitada, chamanda a funcao identifica_numeros, 
+passando como parâmetro a equação e um ponteiro ('endereço' físico onde a variável quantidade fica na memória) para a
+variável quantidade, que vai servir de controle para quantos coeficientes estão na equação para futuramente montarmos a
+matriz aumentada.
 
 [main.c - linha 17]
 o getchar() lê o último caractere do buffer de entrada, que é atribuído ao c.
