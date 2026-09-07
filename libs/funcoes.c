@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include<string.h>
 
 double *identifica_numeros(const char *equacao, int *qtd)
 {
@@ -32,30 +33,49 @@ double *identifica_numeros(const char *equacao, int *qtd)
     return numeros;
 }
 
-void scan_equacao(int n)
+void scan_equacao(int n, double matriz[3][3])
 {
     char equacao[50];
 
-    for (int i = 0; i < n; i++)
+    // inicia a matriz zerada
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            matriz[i][j] = 0.0;
+        }
+    }
+
+    for (int i = 0; i < n && i < 3; i++)
     {
         printf("\nDigite a equação %d: ", i + 1);
         
-        // Lê a linha inteira incluindo espaços (máx 49 chars)
-        if (fgets(equacao, sizeof(equacao), stdin) == NULL) continue;
+        // Loop para ignorar linhas vazias deixadas por scanfs anteriores
+        do {
+            if (fgets(equacao, sizeof(equacao), stdin) == NULL) break;
+            
+            // Remove o '\n' do final da string lida
+            equacao[strcspn(equacao, "\n")] = '\0';
+            
+        } while (strlen(equacao) == 0); // Se for linha vazia, tenta ler novamente
 
         int qtd_equacao = 0; // Quantidade específica DESTA equação
         double *numeros = identifica_numeros(equacao, &qtd_equacao);
 
-        if (numeros != NULL)
-        {
-            printf("Números encontrados (%d): ", qtd_equacao);
-            for (int j = 0; j < qtd_equacao; j++)
+        if (numeros != NULL){
+            for (int j = 0; j < qtd_equacao && j < 3; j++)
             {
-                printf("%lf ", numeros[j]);
+                matriz[i][j] = numeros[j];
             }
-            printf("\n");
-
-            free(numeros); // Evita vazamento de memória
+            free(numeros);
         }
     }
+
+    // Exibição do resultado
+    printf("\nMatriz Resultante:\n");
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            printf("%.2f\t", matriz[i][j]);
+        }
+        printf("\n");
+    }
+    
 }
