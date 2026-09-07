@@ -2,10 +2,10 @@
 #include <stdlib.h>
 #include <ctype.h>
 
-int *identifica_numeros(const char *equacao, int *qtd)
+double *identifica_numeros(const char *equacao, int *qtd)
 {
     // Aloca espaço razoável para os números extraídos
-    int *numeros = malloc(50 * sizeof(int));
+    double *numeros = malloc(50 * sizeof(double));
     if (numeros == NULL) return NULL;
 
     int num_count = 0;
@@ -14,14 +14,14 @@ int *identifica_numeros(const char *equacao, int *qtd)
     {
         if (isdigit((unsigned char)equacao[i]))
         {
-            int valor_atual = 0;
+            double valor_atual = 0;
             while (isdigit((unsigned char)equacao[i]))
             {
                 valor_atual = valor_atual * 10 + (equacao[i] - '0');
                 i++;
             }
             numeros[num_count++] = valor_atual;
-        }
+        }   
         else
         {
             i++;
@@ -44,14 +44,14 @@ void scan_equacao(int n)
         if (fgets(equacao, sizeof(equacao), stdin) == NULL) continue;
 
         int qtd_equacao = 0; // Quantidade específica DESTA equação
-        int *numeros = identifica_numeros(equacao, &qtd_equacao);
+        double *numeros = identifica_numeros(equacao, &qtd_equacao);
 
         if (numeros != NULL)
         {
             printf("Números encontrados (%d): ", qtd_equacao);
             for (int j = 0; j < qtd_equacao; j++)
             {
-                printf("%d ", numeros[j]);
+                printf("%lf ", numeros[j]);
             }
             printf("\n");
 
