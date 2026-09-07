@@ -1,0 +1,10 @@
+Este arquivo tem o propósito de 'explicar' trechos do código para melhor
+entendimento da sua complexidade.
+
+[main.c - linha 17]
+o getchar() lê o último caractere do buffer de entrada, que é atribuído ao c.
+depois, o c passa por uma verificação pra ver se não é uma quebra de linha ou o 
+fim do arquivo. como o while não faz nada, ele apenas extrai caractere por 
+caractere do buffer até encontrar \n ou termninar o arquivo (EOF). Essa
+limpeza ocorre para que o fgets(função em C que lê toda uma linha de texto, 
+incluindo espaços) não encontre dados errados na hora da leitura.
