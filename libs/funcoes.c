@@ -1,22 +1,37 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include<string.h>
+#include <string.h>
+#include <math.h>
 
-// Retorna o índice da coluna com base no caractere da variável
-int obtém_indice_var(char c) {
-    switch (tolower((unsigned char)c)) {
-        case 'w': return 0;
-        case 'x': return 1;
-        case 'y': return 2;
-        case 'z': return 3;
-        default:  return -1; // Caractere inválido
+int obtém_indice_var(char c, int n) {
+    char var = tolower((unsigned char)c);
+    
+    // Se o sistema for de 3 variáveis (x, y, z)
+    if (n == 3) {
+        switch (var) {
+            case 'x': return 0;
+            case 'y': return 1;
+            case 'z': return 2;
+            default:  return -1;
+        }
+    } 
+    // Se for de 4 variáveis (w, x, y, z)
+    else if (n == 4) {
+        switch (var) {
+            case 'w': return 0;
+            case 'x': return 1;
+            case 'y': return 2;
+            case 'z': return 3;
+            default:  return -1;
+        }
     }
+    
+    return -1;
 }
 
 double *identifica_numeros(const char *equacao, int n)
 {
-    // Aloca n + 1 colunas (n para variáveis + 1 para o termo independente)
     double *linha_matriz = (double *) calloc(n + 1, sizeof(double));
     if (linha_matriz == NULL) return NULL;
 
@@ -24,13 +39,11 @@ double *identifica_numeros(const char *equacao, int n)
 
     for (int i = 0; equacao[i] != '\0'; )
     {
-        // Ignora espaços
         if (isspace((unsigned char)equacao[i])) {
             i++;
             continue;
         }
 
-        // Detecta a transição para o termo independente
         if (equacao[i] == '=') {
             depois_do_igual = 1;
             i++;
@@ -53,7 +66,7 @@ double *identifica_numeros(const char *equacao, int n)
         int leu_numero = 0;
 
         if (isdigit((unsigned char)equacao[i]) || equacao[i] == '.') {
-            coef = atof(&equacao[i]); // Leitura tratada (aceita decimais)
+            coef = atof(&equacao[i]);
             while (isdigit((unsigned char)equacao[i]) || equacao[i] == '.') i++;
             leu_numero = 1;
         }
@@ -62,13 +75,13 @@ double *identifica_numeros(const char *equacao, int n)
 
         // 3. Atribuição à Matriz
         if (depois_do_igual) {
-            // Se já passou do '=', guarda o valor na última coluna (posição n)
             if (leu_numero) {
                 linha_matriz[n] = sinal * coef;
             }
         } 
         else if (isalpha((unsigned char)equacao[i])) {
-            int col = obtém_indice_var(equacao[i]);
+            // Passamos 'n' para mapear x->0, y->1, z->2 corretamente em 3x3
+            int col = obtém_indice_var(equacao[i], n);
             if (col >= 0 && col < n) {
                 linha_matriz[col] = sinal * coef;
             }
@@ -95,7 +108,6 @@ void scan_equacao(int n, double **matriz)
         double *linha = identifica_numeros(equacao, n);
 
         if (linha != NULL) {
-            // Copia n + 1 colunas (coeficientes + termo independente)
             for (int j = 0; j <= n; j++) {
                 matriz[i][j] = linha[j];
             }
@@ -109,7 +121,50 @@ void scan_equacao(int n, double **matriz)
         for (int j = 0; j < n; j++) {
             printf("%.2f\t", matriz[i][j]);
         }
-        // Exibe o termo independente separado por barra
-        printf("|  %.2f\n", matriz[i][n]);
+        printf("  %.2f\n", matriz[i][n]);
+    }
+}
+
+void escalonar_matriz(int n, double **matriz)
+{
+    for (int k = 0; k < n - 1; k++) {
+        
+        // Verifica se o pivô é zero para evitar divisão por zero simples
+        if (fabs(matriz[k][k]) < 1e-9) {
+            // Tenta encontrar uma linha abaixo com valor não nulo apenas se o pivô for zero
+            for (int i = k + 1; i < n; i++) {
+                if (fabs(matriz[i][k]) > 1e-9) {
+                    double *temp = matriz[k];
+                    matriz[k] = matriz[i];
+                    matriz[i] = temp;
+                    break;
+                }
+            }
+        }
+
+        if (fabs(matriz[k][k]) < 1e-9) continue;
+
+        // Eliminação dos elementos abaixo do pivô
+        for (int i = k + 1; i < n; i++) {
+            double fator = matriz[i][k] / matriz[k][k];
+            
+            for (int j = k; j <= n; j++) {
+                matriz[i][j] -= fator * matriz[k][j];
+            }
+        }
+    }
+}
+
+void imprime_matriz(int n, double **matriz, const char *titulo)
+{
+    printf("\n--- %s ---\n", titulo);
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            // Evita exibir -0.00 devido à precisão de ponto flutuante
+            double val = fabs(matriz[i][j]) < 1e-9 ? 0.0 : matriz[i][j];
+            printf("%.2f\t", val);
+        }
+        double termo_indep = fabs(matriz[i][n]) < 1e-9 ? 0.0 : matriz[i][n];
+        printf("|  %.2f\n", termo_indep);
     }
 }
