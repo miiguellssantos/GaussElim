@@ -26,8 +26,32 @@ int obtém_indice_var(char c, int n) {
             default:  return -1;
         }
     }
+    // Se for de 5 variáveis (v, w, x, y, z)
+    else if (n == 5) {
+        switch (var) {
+            case 'w': return 0;
+            case 'x': return 1;
+            case 'y': return 2;
+            case 'z': return 3;
+            default:  return -1;
+        }
+    }
     
     return -1;
+}
+
+char obtém_nome_var(int index, int n) {
+    if (n == 3) {
+        char vars[] = {'x', 'y', 'z'};
+        return vars[index];
+    } else if (n == 4) {
+        char vars[] = {'w', 'x', 'y', 'z'};
+        return vars[index];
+    } else if (n == 5) {
+        char vars[] = {'v', 'w', 'x', 'y', 'z'};
+        return vars[index];
+    }
+    return '?';
 }
 
 double *identifica_numeros(const char *equacao, int n)
@@ -167,4 +191,39 @@ void imprime_matriz(int n, double **matriz, const char *titulo)
         double termo_indep = fabs(matriz[i][n]) < 1e-9 ? 0.0 : matriz[i][n];
         printf("|  %.2f\n", termo_indep);
     }
+}
+
+void resolver_substituicao_regressiva(int n, double **matriz)
+{
+    double *solucao = (double *) malloc(n * sizeof(double));
+    if (solucao == NULL) return;
+
+    // Resolve de baixo para cima (i de n-1 até 0)
+    for (int i = n - 1; i >= 0; i--) {
+        
+        // Verifica se o pivô é zero (sistema sem solução única)
+        if (fabs(matriz[i][i]) < 1e-9) {
+            printf("\nO sistema não possui solução única (possível SPI ou SI).\n");
+            free(solucao);
+            return;
+        }
+
+        double soma = 0.0;
+        for (int j = i + 1; j < n; j++) {
+            soma += matriz[i][j] * solucao[j];
+        }
+
+        // Isola x_i: (termo_independente - soma_dos_conhecidos) / pivo
+        solucao[i] = (matriz[i][n] - soma) / matriz[i][i];
+    }
+
+    // Exibição dos resultados finais
+    printf("\n--- Solução do Sistema ---\n");
+    for (int i = 0; i < n; i++) {
+        // Limpa potenciais valores -0.00 de ponto flutuante
+        double val = fabs(solucao[i]) < 1e-9 ? 0.0 : solucao[i];
+        printf("%c = %.2f\n", obtém_nome_var(i, n), val);
+    }
+
+    free(solucao);
 }

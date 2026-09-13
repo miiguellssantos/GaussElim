@@ -24,6 +24,7 @@ int main()
         scan_equacao(equacoes, matriz);
         escalonar_matriz(equacoes, matriz);
         imprime_matriz(equacoes, matriz, "Matriz Escalonada");
+        resolver_substituicao_regressiva(equacoes, matriz);
 
         // Liberação de memória
         for (int i = 0; i < equacoes; i++) {
