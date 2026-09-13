@@ -33,18 +33,18 @@ double *identifica_numeros(const char *equacao, int *qtd)
     return numeros;
 }
 
-void scan_equacao(int n, double matriz[3][3])
+void scan_equacao(int n, double **matriz)
 {
-    char equacao[50];
+    char equacao[100];
 
     // inicia a matriz zerada
-    for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < 3; j++) {
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
             matriz[i][j] = 0.0;
         }
     }
 
-    for (int i = 0; i < n && i < 3; i++)
+    for (int i = 0; i < n; i++)
     {
         printf("\nDigite a equação %d: ", i + 1);
         
@@ -61,7 +61,7 @@ void scan_equacao(int n, double matriz[3][3])
         double *numeros = identifica_numeros(equacao, &qtd_equacao);
 
         if (numeros != NULL){
-            for (int j = 0; j < qtd_equacao && j < 3; j++)
+            for (int j = 0; j < qtd_equacao && j < n; j++)
             {
                 matriz[i][j] = numeros[j];
             }
@@ -71,8 +71,8 @@ void scan_equacao(int n, double matriz[3][3])
 
     // Exibição do resultado
     printf("\nMatriz Resultante:\n");
-    for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < 3; j++) {
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
             printf("%.2f\t", matriz[i][j]);
         }
         printf("\n");
