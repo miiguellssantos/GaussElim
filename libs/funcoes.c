@@ -3,79 +3,113 @@
 #include <ctype.h>
 #include<string.h>
 
-double *identifica_numeros(const char *equacao, int *qtd)
+// Retorna o índice da coluna com base no caractere da variável
+int obtém_indice_var(char c) {
+    switch (tolower((unsigned char)c)) {
+        case 'w': return 0;
+        case 'x': return 1;
+        case 'y': return 2;
+        case 'z': return 3;
+        default:  return -1; // Caractere inválido
+    }
+}
+
+double *identifica_numeros(const char *equacao, int n)
 {
-    // Aloca espaço razoável para os números extraídos
-    double *numeros = malloc(50 * sizeof(double));
-    if (numeros == NULL) return NULL;
+    // Aloca n + 1 colunas (n para variáveis + 1 para o termo independente)
+    double *linha_matriz = (double *) calloc(n + 1, sizeof(double));
+    if (linha_matriz == NULL) return NULL;
 
-    int num_count = 0;
+    int depois_do_igual = 0;
 
-    for (int i = 0; equacao[i] != '\0';)
+    for (int i = 0; equacao[i] != '\0'; )
     {
-        if (isdigit((unsigned char)equacao[i]))
-        {
-            double valor_atual = 0;
-            while (isdigit((unsigned char)equacao[i]))
-            {
-                valor_atual = valor_atual * 10 + (equacao[i] - '0');
-                i++;
+        // Ignora espaços
+        if (isspace((unsigned char)equacao[i])) {
+            i++;
+            continue;
+        }
+
+        // Detecta a transição para o termo independente
+        if (equacao[i] == '=') {
+            depois_do_igual = 1;
+            i++;
+            continue;
+        }
+
+        // 1. Sinal (+ ou -)
+        int sinal = 1;
+        if (equacao[i] == '-') {
+            sinal = -1;
+            i++;
+        } else if (equacao[i] == '+') {
+            i++;
+        }
+
+        while (isspace((unsigned char)equacao[i])) i++;
+
+        // 2. Leitura do Coeficiente
+        double coef = 1.0;
+        int leu_numero = 0;
+
+        if (isdigit((unsigned char)equacao[i]) || equacao[i] == '.') {
+            coef = atof(&equacao[i]); // Leitura tratada (aceita decimais)
+            while (isdigit((unsigned char)equacao[i]) || equacao[i] == '.') i++;
+            leu_numero = 1;
+        }
+
+        while (isspace((unsigned char)equacao[i])) i++;
+
+        // 3. Atribuição à Matriz
+        if (depois_do_igual) {
+            // Se já passou do '=', guarda o valor na última coluna (posição n)
+            if (leu_numero) {
+                linha_matriz[n] = sinal * coef;
             }
-            numeros[num_count++] = valor_atual;
-        }   
-        else
-        {
+        } 
+        else if (isalpha((unsigned char)equacao[i])) {
+            int col = obtém_indice_var(equacao[i]);
+            if (col >= 0 && col < n) {
+                linha_matriz[col] = sinal * coef;
+            }
             i++;
         }
     }
 
-    *qtd = num_count;
-    return numeros;
+    return linha_matriz;
 }
 
 void scan_equacao(int n, double **matriz)
 {
     char equacao[100];
 
-    // inicia a matriz zerada
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-            matriz[i][j] = 0.0;
-        }
-    }
-
     for (int i = 0; i < n; i++)
     {
         printf("\nDigite a equação %d: ", i + 1);
         
-        // Loop para ignorar linhas vazias deixadas por scanfs anteriores
         do {
             if (fgets(equacao, sizeof(equacao), stdin) == NULL) break;
-            
-            // Remove o '\n' do final da string lida
             equacao[strcspn(equacao, "\n")] = '\0';
-            
-        } while (strlen(equacao) == 0); // Se for linha vazia, tenta ler novamente
+        } while (strlen(equacao) == 0);
 
-        int qtd_equacao = 0; // Quantidade específica DESTA equação
-        double *numeros = identifica_numeros(equacao, &qtd_equacao);
+        double *linha = identifica_numeros(equacao, n);
 
-        if (numeros != NULL){
-            for (int j = 0; j < qtd_equacao && j < n; j++)
-            {
-                matriz[i][j] = numeros[j];
+        if (linha != NULL) {
+            // Copia n + 1 colunas (coeficientes + termo independente)
+            for (int j = 0; j <= n; j++) {
+                matriz[i][j] = linha[j];
             }
-            free(numeros);
+            free(linha);
         }
     }
 
-    // Exibição do resultado
-    printf("\nMatriz Resultante:\n");
+    // Exibição da Matriz Aumentada
+    printf("\nMatriz Aumentada Resultante:\n");
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
             printf("%.2f\t", matriz[i][j]);
         }
-        printf("\n");
+        // Exibe o termo independente separado por barra
+        printf("|  %.2f\n", matriz[i][n]);
     }
-    
 }
