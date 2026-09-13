@@ -1,4 +1,5 @@
 Este arquivo tem o propósito de 'explicar' trechos do código para melhor entendimento da sua complexidade.
+Por enquanto, o programa suporta apenas sistemas lineares com 2 incógnitas e 3 equações. Mas será adaptado no futuro.
 
 roteiro de execução:
 1. main.c pergunta quantas equações serão digitadas e chama scan_equacao
