@@ -1,8 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <ctype.h>
-#include "funcoes.h"
-#include <string.h>
+#include "libs/funcoes.h"
 #include <windows.h>
 
 int main() 
@@ -15,10 +13,10 @@ int main()
         int c;
         while ((c = getchar()) != '\n' && c != EOF); 
 
-        // Alocação para Matriz Aumentada: 'equacoes' linhas por 'equacoes + 1' colunas
-        double **matriz = (double **) malloc(equacoes * sizeof(double *));
+        // Alocação da matriz do tipo Fracao
+        Fracao **matriz = (Fracao **) malloc(equacoes * sizeof(Fracao *));
         for (int i = 0; i < equacoes; i++) {
-            matriz[i] = (double *) malloc((equacoes + 1) * sizeof(double));
+            matriz[i] = (Fracao *) malloc((equacoes + 1) * sizeof(Fracao));
         }
 
         scan_equacao(equacoes, matriz);
